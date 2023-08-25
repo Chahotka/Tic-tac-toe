@@ -1,0 +1,5 @@
+.stage {
+  display: grid;
+  grid-template-rows: repeat(3, 60px);
+  grid-template-columns: repeat(3, 60px);
+}

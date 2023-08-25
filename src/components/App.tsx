@@ -1,9 +1,10 @@
+import TicTac from "./TicTac";
 
 
 function App() {
   return (
     <>
-      asdf
+      <TicTac />
     </>
   )
 }
