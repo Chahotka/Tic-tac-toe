@@ -1,10 +1,13 @@
+import FigureProvider from "../context/FigureContext";
 import TicTac from "./TicTac";
 
 
 function App() {
   return (
     <>
-      <TicTac />
+      <FigureProvider>
+        <TicTac />
+      </FigureProvider>
     </>
   )
 }

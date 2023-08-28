@@ -1,16 +1,20 @@
 import React from 'react'
 import cl from '../../styles/cell.module.css'
-import { StageInterface } from '../../interfaces/StageInterface'
 
 interface CellProps {
-  cell: StageInterface
-  stage: StageInterface[]
+  cell: [string | number, string]
 }
 
-const Cell: React.FC<CellProps> = ({cell, stage}) => {
+const Cell: React.FC<CellProps> = ({cell}) => {
+
   return (
-    <li className={cl.cell}>
-    </li>
+    <>
+      <li 
+        className={cl.cell}
+      >
+
+      </li>
+    </>
   )
 }
 

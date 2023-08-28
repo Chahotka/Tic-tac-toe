@@ -1,27 +1,28 @@
-import { createContext, FC, ReactNode, useState } from 'react'
-import { FigureInteface } from '../interfaces/FigureInterface'
+import { createContext, useState } from 'react'
+import { ContextInterface, Figure } from '../interfaces/ContextInterface'
 
-
-export const FigureContext = createContext<FigureInteface>({
-  figure: 'x', 
+export const FigureContext = createContext<ContextInterface>({
+  figure: 'x',
   setFigure: () => {}
 })
 
-
-type FigureProviderProps = {
-  children: ReactNode
+interface ProviderProps {
+  children: React.ReactNode
 }
 
-// figure присваивается объект
-
-export const FigureProvider: FC<FigureProviderProps> = ({children}) => {
-  const [figure, setFigure] = useState<FigureInteface>('x')
+const FigureProvider: React.FC<ProviderProps> = ({children}) => {
+  const [figure, setFigure] = useState<Figure>('x')
 
   return (
     <FigureContext.Provider
-      value={figure}
+      value={{
+        figure,
+        setFigure
+      }}
     >
       { children }
     </FigureContext.Provider>
   )
 }
+
+export default FigureProvider
