@@ -1,6 +1,6 @@
-export type Figure = 'x' | 'o'
+export type TFigure = 'x' | 'o'
 
 export interface ContextInterface {
-  figure: Figure
-  setFigure: React.Dispatch<React.SetStateAction<Figure>>
+  figure: TFigure
+  setFigure: React.Dispatch<React.SetStateAction<TFigure>>
 }

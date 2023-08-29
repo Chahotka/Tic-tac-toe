@@ -1,5 +1,5 @@
 import { createContext, useState } from 'react'
-import { ContextInterface, Figure } from '../interfaces/ContextInterface'
+import { ContextInterface, TFigure } from '../interfaces/ContextInterface'
 
 export const FigureContext = createContext<ContextInterface>({
   figure: 'x',
@@ -11,7 +11,7 @@ interface ProviderProps {
 }
 
 const FigureProvider: React.FC<ProviderProps> = ({children}) => {
-  const [figure, setFigure] = useState<Figure>('x')
+  const [figure, setFigure] = useState<TFigure>('x')
 
   return (
     <FigureContext.Provider

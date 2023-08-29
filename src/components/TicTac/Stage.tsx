@@ -5,15 +5,16 @@ import Cell from './Cell'
 
 interface StageProps {
   stage: Stages
+  tag: Function
 }
 
-const Stage: React.FC<StageProps> = ({stage}) => {
+const Stage: React.FC<StageProps> = ({stage, tag}) => {
 
   return (
     <ul className={cl.stage}>
       {stage.map(row => 
         row.map((cell, key) =>
-            <Cell key={key} cell={cell}/>
+            <Cell key={key} cell={cell} tag={tag} />
           )
         )}
     </ul>

@@ -4,8 +4,45 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
 }
 
 .active {
   background: #ffffff2d;
+}
+
+.cell:nth-child(1) {
+  border-left: none;
+  border-top: none;
+}
+
+.cell:nth-child(2) {
+  border-top: none;
+}
+
+.cell:nth-child(3) {
+  border-right: none;
+  border-top: none;
+}
+
+.cell:nth-child(4) {
+  border-left: none;
+}
+
+.cell:nth-child(6) {
+  border-right: none;
+}
+
+.cell:nth-child(7) {
+  border-left: none;
+  border-bottom: none;
+}
+
+.cell:nth-child(8) {
+  border-bottom: none;
+}
+
+.cell:nth-child(9) {
+  border-right: none;
+  border-bottom: none;
 }

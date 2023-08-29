@@ -1,18 +1,18 @@
 import { useState, Dispatch, SetStateAction } from 'react'
-import { Figure } from '../interfaces/ContextInterface'
+import { TFigure } from '../interfaces/ContextInterface'
 
 const usePlayer = 
 (
-  figure: Figure,
-  setFigure: Dispatch<SetStateAction<Figure>>
+  figure: TFigure,
+  setFigure: Dispatch<SetStateAction<TFigure>>
 ) => {
-  const [player, setPlayer] = useState('x')
+  const [player, setPlayer] = useState<TFigure>('x')
 
   const updatePlayer = () => {
     figure === 'x' ? setFigure('o') : setFigure('x')
     setPlayer(figure)
   }
-  
+
 
   return { player, updatePlayer }
 }
