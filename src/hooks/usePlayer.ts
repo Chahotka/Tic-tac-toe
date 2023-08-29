@@ -6,15 +6,13 @@ const usePlayer =
   figure: TFigure,
   setFigure: Dispatch<SetStateAction<TFigure>>
 ) => {
-  const [player, setPlayer] = useState<TFigure>('x')
 
   const updatePlayer = () => {
     figure === 'x' ? setFigure('o') : setFigure('x')
-    setPlayer(figure)
   }
 
 
-  return { player, updatePlayer }
+  return { updatePlayer }
 }
 
 export default usePlayer

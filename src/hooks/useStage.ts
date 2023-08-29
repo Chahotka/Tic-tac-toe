@@ -3,7 +3,7 @@ import { Stages, createStage } from '../gameHelpers'
 import { TFigure } from '../interfaces/ContextInterface'
 
 
-const useStage = (player: TFigure) => {
+const useStage = (figure: TFigure) => {
   const [stage, setStage] = useState<Stages>(createStage())
 
   useEffect(() => {
@@ -12,13 +12,11 @@ const useStage = (player: TFigure) => {
           row.map((cell: any) => cell[1] === 'clear' ? [0, 'clear'] : cell)
         )
 
-      console.log(newStage)
-
       return newStage
     }
 
     setStage((prev: Stages) => updatedStage(prev))
-  }, [player])
+  }, [figure])
 
   return { stage, setStage }
 }
