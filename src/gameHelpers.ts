@@ -8,7 +8,8 @@ export const createStage = (): Stages =>
 
 export const checkGameover = (
   stage: Stages,
-  setGameover: React.Dispatch<React.SetStateAction<boolean>>
+  setGameover: React.Dispatch<React.SetStateAction<boolean>>,
+  tCount: number,
   ) => {
   const figuresArray = stage.map(row => row.map(cell => cell[0]))
   
@@ -33,7 +34,6 @@ export const checkGameover = (
       console.log('win vertical')
     }
   }
-
   if (
     // Проверка на схожесть по диагонали
     figuresArray[0][0] === figuresArray[1][1] &&
@@ -45,5 +45,11 @@ export const checkGameover = (
   ) {
     setGameover(true)
     console.log('win diagonal')
-  } else {}
+  }
+
+  // Проверка на ничью
+  if (tCount === 9) {
+    setGameover(true)
+    console.log('tie')
+  }
 }
