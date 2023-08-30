@@ -1,14 +1,30 @@
+import { GameoverInterface } from "./interfaces/GameoverInterface"
+
 export type Figures = [number | string][]
 export type Stages = [number | string, string][][]
 
 export const createStage = (): Stages => 
-  Array.from(Array(3), () =>
-    Array(3).fill([0, 'clear'])
-  )
+  [
+    [
+      [0, 'clear'],
+      [0, 'clear'],
+      [0, 'clear']
+    ],
+    [
+      [0, 'clear'],
+      [0, 'clear'],
+      [0, 'clear']
+    ],
+    [
+      [0, 'clear'],
+      [0, 'clear'],
+      [0, 'clear']
+    ]
+  ]
 
 export const checkGameover = (
   stage: Stages,
-  setGameover: React.Dispatch<React.SetStateAction<boolean>>,
+  setGameover: React.Dispatch<React.SetStateAction<GameoverInterface>>,
   tCount: number,
   ) => {
   const figuresArray = stage.map(row => row.map(cell => cell[0]))
@@ -22,16 +38,22 @@ export const checkGameover = (
       // Проверка на то что в ячейке есть фигура
       figuresArray[x][0] !== 0
     ) {
-      setGameover(true)
-      console.log('win horizontal')
+      setGameover({
+        over: true,
+        reason: figuresArray[x][0] === 'x' ? 'x win' : 'o win'
+      })
+      console.log('horiz')
     } else if (
       // Проверка на схожесть по вертикали
       figuresArray[0][x] === figuresArray[1][x] &&
       figuresArray[0][x] === figuresArray[2][x] &&
       figuresArray[0][x] !== 0
     ) {
-      setGameover(true)
-      console.log('win vertical')
+      setGameover({
+        over: true,
+        reason: figuresArray[0][x] === 'x' ? 'x win' : 'o win'
+      })
+      console.log('vert')
     }
   }
   if (
@@ -43,13 +65,18 @@ export const checkGameover = (
     figuresArray[0][2] === figuresArray[2][0] &&
     figuresArray[0][2] !== 0
   ) {
-    setGameover(true)
-    console.log('win diagonal')
+    setGameover({
+      over: true,
+      reason: figuresArray[1][1] === 'x' ? 'x win' : 'o win'
+    })
   }
 
   // Проверка на ничью
   if (tCount === 9) {
-    setGameover(true)
-    console.log('tie')
+    setGameover({
+      over: true,
+      reason: 'draw'
+    })
+    console.log('draw conc')
   }
 }

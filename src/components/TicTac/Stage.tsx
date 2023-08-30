@@ -12,9 +12,9 @@ const Stage: React.FC<StageProps> = ({stage, tag}) => {
 
   return (
     <ul className={cl.stage}>
-      {stage.map(row => 
-        row.map((cell, key) =>
-            <Cell key={key} cell={cell} tag={tag} />
+      {stage.map(row=> 
+        row.map(cell =>
+            <Cell key={Math.random()} cell={cell} tag={tag} />
           )
         )}
     </ul>

@@ -11,12 +11,12 @@ const useStage = (figure: TFigure) => {
       const newStage = prevStage.map(row =>
           row.map((cell: any) => cell[1] === 'clear' ? [0, 'clear'] : cell)
         )
-
       return newStage
     }
 
     setStage((prev: Stages) => updatedStage(prev))
   }, [figure])
+
 
   return { stage, setStage }
 }

@@ -1,15 +1,23 @@
 import React from 'react'
+import { GameoverInterface } from '../../interfaces/GameoverInterface'
+import { Stages, createStage } from '../../gameHelpers'
 
 interface GameoverProps {
-  setGameover: React.Dispatch<React.SetStateAction<boolean>>
+  reason: string | null
+  gameoverHandler: Function
 }
 
-const Gameover: React.FC<GameoverProps> = ({setGameover}) => {
+const Gameover: React.FC<GameoverProps> = ({reason, gameoverHandler}) => {
 
   return (
     <>
-      <p>Gameover</p>
-      <button onClick={() => setGameover(false)}>Restart?</button>
+      <p>
+        {reason === 'draw'
+          ? 'draw'
+          : reason
+        }
+      </p>
+      <button onClick={() => gameoverHandler()}>Restart?</button>
     </>
   )
 }
