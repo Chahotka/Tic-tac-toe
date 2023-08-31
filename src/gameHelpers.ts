@@ -40,7 +40,7 @@ export const checkGameover = (
     ) {
       setGameover({
         over: true,
-        reason: figuresArray[x][0] === 'x' ? 'x win' : 'o win'
+        reason: figuresArray[x][0] === 'x' ? 'X Win' : 'O Win'
       })
       console.log('horiz')
     } else if (
@@ -51,7 +51,7 @@ export const checkGameover = (
     ) {
       setGameover({
         over: true,
-        reason: figuresArray[0][x] === 'x' ? 'x win' : 'o win'
+        reason: figuresArray[0][x] === 'x' ? 'X Win' : 'O Win'
       })
       console.log('vert')
     }
@@ -67,7 +67,7 @@ export const checkGameover = (
   ) {
     setGameover({
       over: true,
-      reason: figuresArray[1][1] === 'x' ? 'x win' : 'o win'
+      reason: figuresArray[1][1] === 'x' ? 'X Win' : 'O Win'
     })
   }
 
@@ -75,7 +75,7 @@ export const checkGameover = (
   if (tCount === 9) {
     setGameover({
       over: true,
-      reason: 'draw'
+      reason: 'Draw'
     })
     console.log('draw conc')
   }

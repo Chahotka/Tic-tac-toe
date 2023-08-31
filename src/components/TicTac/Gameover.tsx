@@ -1,6 +1,5 @@
 import React from 'react'
-import { GameoverInterface } from '../../interfaces/GameoverInterface'
-import { Stages, createStage } from '../../gameHelpers'
+import cl from '../../styles/gameover.module.css'
 
 interface GameoverProps {
   reason: string | null
@@ -10,15 +9,12 @@ interface GameoverProps {
 const Gameover: React.FC<GameoverProps> = ({reason, gameoverHandler}) => {
 
   return (
-    <>
-      <p>
-        {reason === 'draw'
-          ? 'draw'
-          : reason
-        }
+    <div className={cl.gameover}>
+      <p className={cl.reason}>
+        { reason }
       </p>
-      <button onClick={() => gameoverHandler()}>Restart?</button>
-    </>
+      <button className={cl.button} onClick={() => gameoverHandler()}>Restart?</button>
+    </div>
   )
 }
 

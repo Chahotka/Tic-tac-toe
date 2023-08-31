@@ -22,7 +22,7 @@ const TicTac: React.FC = () => {
   }, [defFigure])
 
 
-  const tag = (e: React.MouseEvent<HTMLLIElement>, cell: [string | number, string]) => {
+  const tag = (cell: [string | number, string]) => {
     if (cell[1] === 'tagged' || gameover.over) {
       return
     }
@@ -30,7 +30,6 @@ const TicTac: React.FC = () => {
     updatePlayer()
     cell[0] = figure
     cell[1] = 'tagged'
-    console.log(tag)
     setTCount((prev: number) => prev += 1)
   }
 
@@ -45,8 +44,6 @@ const TicTac: React.FC = () => {
       ? setDefFigure('o')
       : setDefFigure('x')
   }
-
-  console.log(defFigure)
 
   return (
     <>

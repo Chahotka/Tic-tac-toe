@@ -1,4 +1,4 @@
 export interface GameoverInterface {
   over: boolean
-  reason: 'x win' | 'o win' | 'draw' | null
+  reason: 'X Win' | 'O Win' | 'Draw' | null
 }
