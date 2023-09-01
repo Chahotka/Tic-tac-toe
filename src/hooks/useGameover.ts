@@ -11,7 +11,7 @@ const useGameover = (
   
 
   useEffect(() => {
-    checkGameover(stage, setGameover, tCount)
+    checkGameover(stage, gameover, setGameover, tCount)
   }, [stage])
 
 
