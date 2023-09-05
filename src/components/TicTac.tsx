@@ -1,7 +1,6 @@
-import React, { useContext, useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import useStage from '../hooks/useStage'
 import usePlayer from '../hooks/usePlayer'
-import { FigureContext } from '../context/FigureContext'
 import Stage from './TicTac/Stage'
 import useGameover from '../hooks/useGameover'
 import Gameover from './TicTac/Gameover'
@@ -12,7 +11,6 @@ const TicTac: React.FC = () => {
   const [defFigure, setDefFigure] = useState<TFigure>('x')
   const [figure, setFigure] = useState<TFigure>(defFigure)
   const [tCount, setTCount] = useState(0)
-  // const { figure, setFigure } = useContext(FigureContext)
   const {  updatePlayer } = usePlayer(figure, setFigure)
   const { stage, setStage } = useStage(figure)
   const { gameover, setGameover } = useGameover(stage, tCount)
