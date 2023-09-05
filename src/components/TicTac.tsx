@@ -6,6 +6,7 @@ import useGameover from '../hooks/useGameover'
 import Gameover from './TicTac/Gameover'
 import { createStage } from '../gameHelpers'
 import { TFigure } from '../interfaces/ContextInterface'
+import Rooms from './TicTac/Rooms'
 
 const TicTac: React.FC = () => {
   const [defFigure, setDefFigure] = useState<TFigure>('x')
@@ -46,6 +47,7 @@ const TicTac: React.FC = () => {
   return (
     <>
       <Stage stage={stage} tag={tag}/>
+      <Rooms />
       {
         gameover.over && 
         <Gameover 

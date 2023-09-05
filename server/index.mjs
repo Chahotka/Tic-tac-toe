@@ -11,12 +11,17 @@ const io = new Server(httpServer, {
   }
 })
 
-app.get('/', (req, res) => {
-  res.send('alive')
+io.of('/room1').on('connect', socket => {
+  console.log('socket: ', socket.id, ' connected')
+
+  socket.on('disconnect', () => {
+    console.log('socket: ', socket.id, ' disconnected')
+  })
 })
 
-io.of('/room1', socket => {
-  console.log(io.engine.clientsCount)
+
+io.on('new_namespace', namespace => {
+  console.log('new namespace was created')
 })
 
 httpServer.listen(5000, () => {
