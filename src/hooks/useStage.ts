@@ -17,6 +17,9 @@ const useStage = (figure: TFigure) => {
     setStage((prev: Stages) => updatedStage(prev))
   }, [figure])
 
+  useEffect(() => {
+  }, [createStage])
+
 
   return { stage, setStage }
 }

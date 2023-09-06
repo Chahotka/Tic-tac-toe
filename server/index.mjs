@@ -1,4 +1,3 @@
-import { v4 } from 'uuid'
 import express from 'express'
 import { createServer } from 'http'
 import { Server } from 'socket.io'
@@ -11,17 +10,13 @@ const io = new Server(httpServer, {
   }
 })
 
-io.of('/room1').on('connect', socket => {
-  console.log('socket: ', socket.id, ' connected')
+io.on('connect', socket => {
+  console.log(io.engine.clientsCount)
 
-  socket.on('disconnect', () => {
-    console.log('socket: ', socket.id, ' disconnected')
+  socket.on('Tag', (stage, callback) => {
+    io.emit('Tag', stage)
+    callback('got fetch')
   })
-})
-
-
-io.on('new_namespace', namespace => {
-  console.log('new namespace was created')
 })
 
 httpServer.listen(5000, () => {
