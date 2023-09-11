@@ -1,14 +1,28 @@
 .rooms {
   display: flex;
   flex-direction: column;
-  background: #333;
-  align-self: start;
-  width: 100%;
+  background: #222;
+  max-height: 420px;
+  overflow: scroll;
 }
 
-.roomName {
+.rooms::-webkit-scrollbar {
+  display: none;
+}
+
+
+.room {
   width: 100%;
   padding: 15px;
   cursor: pointer;
   letter-spacing: 2px;
+  user-select: none;
+}
+
+.room:hover {
+  background: #111;
+}
+
+.button {
+  width: 100%;
 }

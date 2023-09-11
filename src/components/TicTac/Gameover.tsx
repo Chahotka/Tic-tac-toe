@@ -1,5 +1,6 @@
 import React from 'react'
 import cl from '../../styles/gameover.module.css'
+import clBtn from '../../styles/button.module.css'
 
 interface GameoverProps {
   reason: string | null
@@ -13,7 +14,7 @@ const Gameover: React.FC<GameoverProps> = ({reason, gameoverHandler}) => {
       <p className={cl.reason}>
         { reason }
       </p>
-      <button className={cl.button} onClick={() => gameoverHandler()}>Restart?</button>
+      <button className={clBtn.button} onClick={() => gameoverHandler()}>Restart?</button>
     </div>
   )
 }

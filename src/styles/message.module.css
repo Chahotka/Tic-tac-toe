@@ -1,0 +1,53 @@
+.message {
+  padding: 0 20px;
+  height: 50px;
+  width: 280px;
+  gap: 10px;
+  right: 40px;
+  bottom: 40px;
+  position: absolute;
+  border: 1px solid #ffffff50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 20px;
+}
+
+.error {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.span {
+  padding: 5px 12px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #000;
+  background: #fff;
+  border-radius: 50%;
+}
+
+.x {
+  height: 20px;
+  width: 20px;
+  display: block;
+  position: relative;
+}
+
+.x:before, .x::after {
+  content: '';
+  width: 20px;
+  height: 1px;
+  background: #fff;
+  position: absolute;
+}
+
+.x::before {
+  top: 10px;
+  rotate: -45deg;
+}
+.x::after {
+  bottom: 9px;
+  rotate: 45deg;
+}

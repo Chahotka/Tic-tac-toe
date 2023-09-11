@@ -10,12 +10,25 @@ const io = new Server(httpServer, {
   }
 })
 
+
+
+
 io.on('connect', socket => {
   console.log(io.engine.clientsCount)
 
   socket.on('Tag', (stage, callback) => {
     io.emit('Tag', stage)
-    callback('got fetch')
+    callback('Move received in server')
+  })
+
+  socket.on('Create player', (playerData, callback) => {
+    console.log(playerData)
+    callback('Player data received')
+  })
+
+  socket.on('Create room', (roomData, callback) => {
+    console.log(roomData)
+    callback('Room data received')
   })
 })
 

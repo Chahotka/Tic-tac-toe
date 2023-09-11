@@ -7,24 +7,16 @@ import Gameover from './TicTac/Gameover'
 import { checkGameover, createStage } from '../gameHelpers'
 import { TFigure } from '../interfaces/ContextInterface'
 import { socket } from '../socket'
+import Modal from './TicTac/Modal'
+import Rooms from './TicTac/Rooms'
 
 const TicTac: React.FC = () => {
-
-  const [defFigure, setDefFigure] = useState<TFigure>('x')
-  const [figure, setFigure] = useState<TFigure>(defFigure)
+  const [figure, setFigure] = useState<TFigure>('x')
   const [tCount, setTCount] = useState(0)
+  const [showModal, setShowModal] = useState(true)
   const {  updatePlayer } = usePlayer(figure, setFigure)
   const { stage, setStage } = useStage(figure)
   const { gameover, setGameover } = useGameover(stage, tCount)
-
-  useEffect(() => {
-    socket.connect()
-  }, [])
-
-  useEffect(() => {
-    setFigure(defFigure)
-  }, [defFigure])
-
 
   const tag = (cell: [string | number, string]) => {
     if (cell[1] === 'tagged' || gameover.over) {
@@ -48,28 +40,37 @@ const TicTac: React.FC = () => {
       over: false,
       reason: null
     })
-    defFigure === 'x'
-      ? setDefFigure('o')
-      : setDefFigure('x')
   }
 
   socket.on('Tag', (arg) => {
-    console.log(arg)
     setStage(arg)
     checkGameover(arg, gameover, setGameover, tCount)
-    console.log(gameover)
   })
 
   return (
     <>
-      <Stage stage={stage} tag={tag}/>
-      {
-        gameover.over && 
-        <Gameover 
-          reason={gameover.reason}
-          gameoverHandler={gameoverHandler}
+      { showModal && 
+        <Modal 
+          type='create player'
+          labelText={'enter player name'} 
+          btnText={'save'} 
+          setShowModal={setShowModal} 
+          canExit={false}
         />
       }
+      <div className="game">
+        <Stage stage={stage} tag={tag}/>
+        {
+          gameover.over && 
+          <Gameover 
+            reason={gameover.reason}
+            gameoverHandler={gameoverHandler}
+          />
+        }
+      </div>
+      <aside className="aside">
+        <Rooms />
+      </aside>
     </>
   )
 }
