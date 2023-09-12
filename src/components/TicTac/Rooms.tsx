@@ -10,7 +10,6 @@ const Rooms: React.FC = () => {
 
   const createRoom = () => {
     setShowModal(true)
-    console.log('wha')
   }
 
 
@@ -26,7 +25,7 @@ const Rooms: React.FC = () => {
         />
       }
       <ul className={cl.rooms}>
-        <li className={cl.room} >Room</li>
+        
       </ul>
       <button 
         className={

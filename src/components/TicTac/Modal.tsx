@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import cl from '../../styles/modal.module.css'
 import clBtn from '../../styles/button.module.css'
 import { socket } from '../../socket'
@@ -23,7 +23,7 @@ const Modal: React.FC<ModalProps> = (
   const [name , setName] = useState('')
   const [reason, setReason] = useState('')
 
-  const submitHandler = (e: React.FormEvent) => {
+  const submitHandler = async(e: React.FormEvent) => {
     e.preventDefault()
 
     if (name.length < 2) {
@@ -39,11 +39,11 @@ const Modal: React.FC<ModalProps> = (
     setShowModal(false)
 
     if (type === 'create player') {
-      socket.connect()
       socket.emit('Create player', {name: name, id: socket.id}, (res: string) => {
         console.log(res)
       })
-    } else if (type === 'create room') {
+    }
+    if (type === 'create room') {
       socket.emit('Create room', {roomName: name, roomId: v4()}, (res: string) => {
         console.log(res)
       })

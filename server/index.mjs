@@ -12,8 +12,8 @@ const io = new Server(httpServer, {
 
 
 
-
 io.on('connect', socket => {
+  console.log('socket connnected')
   console.log(io.engine.clientsCount)
 
   socket.on('Tag', (stage, callback) => {
@@ -29,6 +29,11 @@ io.on('connect', socket => {
   socket.on('Create room', (roomData, callback) => {
     console.log(roomData)
     callback('Room data received')
+  })
+
+  socket.on('disconnect', () => {
+    console.log('socket disconnected')
+    console.log(io.engine.clientsCount)
   })
 })
 

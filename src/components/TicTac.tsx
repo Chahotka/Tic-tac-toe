@@ -47,6 +47,10 @@ const TicTac: React.FC = () => {
     checkGameover(arg, gameover, setGameover, tCount)
   })
 
+  useEffect(() => {
+    socket.connect()
+  }, [])
+
   return (
     <>
       { showModal && 
