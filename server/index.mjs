@@ -11,9 +11,8 @@ const io = new Server(httpServer, {
 })
 
 
-
 io.on('connect', socket => {
-  console.log('socket connnected')
+  console.log('Socket connected')
   console.log(io.engine.clientsCount)
 
   socket.on('Tag', (stage, callback) => {
@@ -22,18 +21,25 @@ io.on('connect', socket => {
   })
 
   socket.on('Create player', (playerData, callback) => {
-    console.log(playerData)
-    callback('Player data received')
+    socket.name = playerData.name
+    console.log(`Player: ${socket.name}`)
+    callback(`Player ${playerData.name} authorized`)
   })
 
-  socket.on('Create room', (roomData, callback) => {
-    console.log(roomData)
-    callback('Room data received')
+  socket.on('Join room', (joinData, callback) => {
+    socket.join(`${joinData.room}`)
+    console.log(`${socket.name} joined room: ${joinData.room}`)
+    callback('suda nahui')
+  })
+
+  socket.on('Leave room', (leaveData, callback) => {
+    socket.leave()
+    console.log(`${socket.name} left room`)
+    callback('tuda nahui')
   })
 
   socket.on('disconnect', () => {
-    console.log('socket disconnected')
-    console.log(io.engine.clientsCount)
+    console.log(`Player ${socket.name} disconnected, total clients ${io.engine.clientsCount}`)
   })
 })
 
