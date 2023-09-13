@@ -1,32 +1,33 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import cl from '../../styles/rooms.module.css'
 import clBtn from '../../styles/button.module.css'
 import Modal from './Modal'
 import { rooms } from '../../gameHelpers'
 import { socket } from '../../socket'
+import { FigureContext } from '../../context/FigureContext'
 
 const Rooms: React.FC = () => {
+  const { room, setRoom } = useContext(FigureContext)
   const [joined, setJoined] = useState(false)
   const [showModal, setShowModal] = useState(false)
-  const [roomName, setRoomName] = useState('')
 
-  const joinRoom = (roomName: string) => {
-    socket.emit('Join room', {room: roomName}, (res: string) => {
-      console.log(res)
+  const joinRoom = (room: string) => {
+    socket.emit('join room', room, (res: string) => {
+      setRoom(res)
       setJoined(true)
     })
   }
 
   const leaveRoom = () => {
-    socket.emit('Leave room', {player: socket.id}, (res: string) => {
-      console.log(res)
+    socket.emit('leave room', room, (res: null) => {
+      setRoom(res)
       setJoined(false)
     })
   }
 
-
   return (
     <>
+      {room}
       {showModal &&
         <Modal 
           type='create room'

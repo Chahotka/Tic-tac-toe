@@ -25,33 +25,33 @@ const Modal: React.FC<ModalProps> = (
 
   const submitHandler = async(e: React.FormEvent) => {
     e.preventDefault()
-
-    if (name.length < 2) {
-      setReason('Name is too short')
+    const stop = checkName()
+    if (!stop) {
       return
-    } else if (name.length > 20) {
-      setReason('Name is too long')
-      return
-    } else {
-      setReason('')
     }
-
+    
+    socket.emit('create player', name, (res: string) => {
+      console.log(res)
+    })
+    
     setShowModal(false)
-
-    if (type === 'create player') {
-      socket.emit('Create player', {name: name, id: socket.id}, (res: string) => {
-        console.log(res)
-      })
-    }
-    if (type === 'create room') {
-      socket.emit('Create room', {roomName: name, roomId: v4()}, (res: string) => {
-        console.log(res)
-      })
-    }
   }
 
   const closeModal = () => {
     setShowModal(false)
+  }
+
+  const checkName = () => {
+    if (name.length < 2) {
+      setReason('Name is too short')
+      return false
+    } else if (name.length > 20) {
+      setReason('Name is too long')
+      return false 
+    } else {
+      setReason('')
+      return true
+    }
   }
 
   return (

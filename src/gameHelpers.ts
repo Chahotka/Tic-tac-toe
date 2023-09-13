@@ -64,13 +64,13 @@ export const checkGameover = (
       return
     } else if (
       // По диагонали
-      figuresArray[0][0] === figuresArray[1][1] &&
+      (figuresArray[0][0] === figuresArray[1][1] &&
       figuresArray[0][0] === figuresArray[2][2] &&
-      figuresArray[0][0] !== 0 
+      figuresArray[0][0] !== 0 )
       ||
-      figuresArray[0][2] === figuresArray[1][1] &&
+      (figuresArray[0][2] === figuresArray[1][1] &&
       figuresArray[0][2] === figuresArray[2][0] &&
-      figuresArray[0][2] !== 0
+      figuresArray[0][2] !== 0)
     ) {
       setGameover({
         over: true,

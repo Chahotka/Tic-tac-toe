@@ -12,36 +12,29 @@ const io = new Server(httpServer, {
 
 
 io.on('connect', socket => {
-  console.log('Socket connected')
-  console.log(io.engine.clientsCount)
 
-  socket.on('Tag', (stage, callback) => {
-    io.emit('Tag', stage)
-    callback('Move received in server')
+  socket.on('create player', (name, callback) => {
+    socket.name = name
+    callback(`Name:( ${name} - ${socket.id})`)
   })
 
-  socket.on('Create player', (playerData, callback) => {
-    socket.name = playerData.name
-    console.log(`Player: ${socket.name}`)
-    callback(`Player ${playerData.name} authorized`)
+  socket.on('join room', (room, callback) => {
+    socket.join(`${room}`)
+    console.log(socket.rooms)
+    callback(room)
   })
 
-  socket.on('Join room', (joinData, callback) => {
-    socket.join(`${joinData.room}`)
-    console.log(`${socket.name} joined room: ${joinData.room}`)
-    callback('suda nahui')
-  })
-
-  socket.on('Leave room', (leaveData, callback) => {
-    socket.leave()
-    console.log(`${socket.name} left room`)
-    callback('tuda nahui')
+  socket.on('leave room', (room, callback) => {
+    socket.leave(`${room}`)
+    console.log(socket.rooms)
+    callback()
   })
 
   socket.on('disconnect', () => {
-    console.log(`Player ${socket.name} disconnected, total clients ${io.engine.clientsCount}`)
+    console.log(`${socket.name} logged out`)
   })
-})
+}) 
+
 
 httpServer.listen(5000, () => {
   console.log('Listening to 5000 bilya') 
