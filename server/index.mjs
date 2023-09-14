@@ -11,8 +11,7 @@ const io = new Server(httpServer, {
 })
 
 
-io.on('connect', socket => {
-
+io.on('connect', async(socket) => {
   socket.on('create player', (name, callback) => {
     socket.name = name
     callback(`Name:( ${name} - ${socket.id})`)
@@ -20,20 +19,31 @@ io.on('connect', socket => {
 
   socket.on('join room', (room, callback) => {
     socket.join(`${room}`)
-    console.log(socket.rooms)
+    console.log
     callback(room)
   })
 
   socket.on('leave room', (room, callback) => {
     socket.leave(`${room}`)
-    console.log(socket.rooms)
     callback()
+  })
+
+  socket.on('tag cell', ({room, stage}) => {
+    io.to(`${room}`).emit('get stage', stage)
+  })
+
+  socket.on('restart game', ({room, stage, gameover, tCount}, callback) => {
+    io.to(`${room}`).emit('restart', {stage, gameover, tCount})
   })
 
   socket.on('disconnect', () => {
     console.log(`${socket.name} logged out`)
   })
 }) 
+
+
+
+
 
 
 httpServer.listen(5000, () => {

@@ -11,8 +11,8 @@ const Rooms: React.FC = () => {
   const [joined, setJoined] = useState(false)
   const [showModal, setShowModal] = useState(false)
 
-  const joinRoom = (room: string) => {
-    socket.emit('join room', room, (res: string) => {
+  const joinRoom = (roomName: string) => {
+    socket.emit('join room', roomName, (res: string) => {
       setRoom(res)
       setJoined(true)
     })
