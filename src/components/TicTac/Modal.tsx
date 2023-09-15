@@ -12,14 +12,13 @@ interface ModalProps {
   setShowModal: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-const Modal: React.FC<ModalProps> = (
-  {
+const Modal: React.FC<ModalProps> = ({
     type,
     labelText, 
     btnText,
     setShowModal, 
-    canExit}
-  ) => {
+    canExit
+  }) => {
   const [name , setName] = useState('')
   const [reason, setReason] = useState('')
 
@@ -30,9 +29,7 @@ const Modal: React.FC<ModalProps> = (
       return
     }
     
-    socket.emit('create player', name, (res: string) => {
-      console.log(res)
-    })
+    socket.emit('create player', name)
     
     setShowModal(false)
   }

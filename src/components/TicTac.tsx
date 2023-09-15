@@ -1,19 +1,18 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState, useContext, useEffect } from 'react'
 import useStage from '../hooks/useStage'
 import usePlayer from '../hooks/usePlayer'
 import Stage from './TicTac/Stage'
 import useGameover from '../hooks/useGameover'
 import Gameover from './TicTac/Gameover'
 import { Stages, createStage } from '../gameHelpers'
-import { TFigure } from '../interfaces/ContextInterface'
 import Modal from './TicTac/Modal'
 import Rooms from './TicTac/Rooms'
 import { FigureContext } from '../context/FigureContext'
 import { socket } from '../socket'
 
 const TicTac: React.FC = () => {
-  const { figure, setFigure, room } = useContext(FigureContext)
   const [tCount, setTCount] = useState(0)
+  const { figure, setFigure, room } = useContext(FigureContext)
   const [showModal, setShowModal] = useState(true)
   const {  updatePlayer } = usePlayer(figure, setFigure)
   const { stage, setStage } = useStage(figure)
@@ -30,11 +29,16 @@ const TicTac: React.FC = () => {
     setTCount((prev: number) => prev += 1)
 
     if (room) {
-      socket.emit('tag cell', {room, stage})
+      socket.emit('tag cell', {stage, tCount: tCount + 1})
     }
+
   }
 
   const gameoverHandler = () => {
+    reset()
+  }
+
+  const reset = () => {
     setTCount(0)
     setStage(createStage())
     setGameover({
@@ -43,29 +47,27 @@ const TicTac: React.FC = () => {
     })
 
     if (room) {
-      console.log('ahkasdl')
-      socket.emit('restart game', {
-        room,
-        stage: createStage(),
-        gameover: {
-          over: false,
-          reason: null
-        },
-        tCount: 0
-      })
+      socket.emit('restart game')
     }
   }
 
-  socket.on('get stage', stage => {
-    console.log(stage)
-    setStage(stage)
-  })
-  socket.on('restart', ({stage, gameover, tCount}) => {
-    setStage(stage)
-    setGameover(gameover)
-    setTCount(tCount)
-  })
+  useEffect(() => {
+    const onTag = (stage: Stages, tCount: number) => {
+      setStage(stage)
+      setTCount(tCount)
+    }
+    const onRestart = () => {
+      reset()
+    }
+  
 
+    socket.on('get tagged', onTag)
+    socket.on('restart', onRestart)
+
+    return () => {
+      socket.off('tag cell', onTag)
+    }
+  }, [])
 
   return (
     <>
@@ -89,7 +91,7 @@ const TicTac: React.FC = () => {
         }
       </div>
       <aside className="aside">
-        <Rooms />
+        <Rooms reset={reset} />
       </aside>
     </>
   )

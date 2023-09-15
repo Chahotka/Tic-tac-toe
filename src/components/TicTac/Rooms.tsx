@@ -6,21 +6,30 @@ import { rooms } from '../../gameHelpers'
 import { socket } from '../../socket'
 import { FigureContext } from '../../context/FigureContext'
 
-const Rooms: React.FC = () => {
+
+interface RoomsProps {
+  reset: Function
+}
+
+const Rooms: React.FC<RoomsProps> = ({ reset }) => {
   const { room, setRoom } = useContext(FigureContext)
   const [joined, setJoined] = useState(false)
   const [showModal, setShowModal] = useState(false)
 
   const joinRoom = (roomName: string) => {
-    socket.emit('join room', roomName, (res: string) => {
-      setRoom(res)
+    reset()
+
+    socket.emit('join room', roomName, () => {
+      setRoom(roomName)
       setJoined(true)
     })
   }
 
   const leaveRoom = () => {
-    socket.emit('leave room', room, (res: null) => {
-      setRoom(res)
+    reset()
+
+    socket.emit('leave room', room, () => {
+      setRoom(null)
       setJoined(false)
     })
   }

@@ -8,8 +8,6 @@ const useGameover = (
 ) => {
   const [gameover, setGameover] = useState<GameoverInterface>({over: false, reason: null})
 
-  
-
   useEffect(() => {
     checkGameover(stage, gameover, setGameover, tCount)
   }, [stage])
