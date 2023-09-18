@@ -29,7 +29,7 @@ const Rooms: React.FC<RoomsProps> = ({ reset }) => {
   const leaveRoom = () => {
     reset()
 
-    socket.emit('leave room', room)
+    socket.emit('leave room', {room, id: socket.id})
   }
 
   useEffect(() => {
@@ -38,11 +38,11 @@ const Rooms: React.FC<RoomsProps> = ({ reset }) => {
       setJoined(joined)
       console.log(room, ' Joined: ', joined)
     }
-    const onLeave = (room: null, joined: boolean) => {
-      setRoom(room)
-      setJoined(joined)
-      console.log(room, ' Joined: ', joined)
-      console.log(socket.id)
+    const onLeave = (room: null, joined: boolean, id: string) => {
+      if (socket.id === id) {
+        setRoom(room)
+        setJoined(joined)
+      }
     }
 
     socket.on('joined', onJoin)
@@ -75,7 +75,7 @@ const Rooms: React.FC<RoomsProps> = ({ reset }) => {
                 className={cl.room}
                 onClick={() => joinRoom(room.name)}
               >
-                { room.name } |||| {`${players} / 2`}
+                { room.name } |||| {`${room.players} / 2`}
               </li>
             )
           })}

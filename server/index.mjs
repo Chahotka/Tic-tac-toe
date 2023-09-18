@@ -18,21 +18,14 @@ io.on('connect', async(socket) => {
   })
 
   socket.on('join room', async(room, callback) => {
-    const sockets = await io.in(room).fetchSockets()
-    if (sockets.length === 2) {
-      io.to(room).emit('full')
-      callback(sockets.length)
-      return
-    }
     socket.room = room
     socket.join(room)
     io.to(room).emit('joined', room, true)
-    callback(sockets.length + 1)
   })
 
-  socket.on('leave room', room => {
+  socket.on('leave room', ({room, id}) => {
     socket.room = undefined
-    io.to(room).emit('left', null, false)
+    io.to(room).emit('left', null, false, id)
     socket.leave(room)
     console.log(socket.name)
   })

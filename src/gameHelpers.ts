@@ -23,11 +23,11 @@ export const createStage = (): Stages =>
   ]
 
 export const rooms = [
-  {name: 'Room 1'},
-  {name: 'Room 2'},
-  {name: 'Room 3'},
-  {name: 'Room 4'},
-  {name: 'Room 5'}
+  {name: 'Room 1', players: 0},
+  {name: 'Room 2', players: 0},
+  {name: 'Room 3', players: 0},
+  {name: 'Room 4', players: 0},
+  {name: 'Room 5', players: 0}
 ]
 
 export const checkGameover = (
