@@ -12,21 +12,29 @@ const io = new Server(httpServer, {
 
 
 io.on('connect', async(socket) => {
-  socket.on('create player', (name, callback) => {
+  socket.on('create player', name  => {
     socket.name = name
+    console.log(socket.id)
   })
 
-  socket.on('join room', (room, callback) => {
-    console.log(room)
+  socket.on('join room', async(room, callback) => {
+    const sockets = await io.in(room).fetchSockets()
+    if (sockets.length === 2) {
+      io.to(room).emit('full')
+      callback(sockets.length)
+      return
+    }
     socket.room = room
-    socket.join(`${room}`)
-    callback()
+    socket.join(room)
+    io.to(room).emit('joined', room, true)
+    callback(sockets.length + 1)
   })
 
-  socket.on('leave room', (room, callback) => {
+  socket.on('leave room', room => {
     socket.room = undefined
-    socket.leave(`${room}`)
-    callback()
+    io.to(room).emit('left', null, false)
+    socket.leave(room)
+    console.log(socket.name)
   })
 
   socket.on('tag cell', ({stage, tCount}) => {

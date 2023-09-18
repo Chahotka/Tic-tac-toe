@@ -60,12 +60,12 @@ const TicTac: React.FC = () => {
       reset()
     }
   
-
     socket.on('get tagged', onTag)
     socket.on('restart', onRestart)
 
     return () => {
       socket.off('tag cell', onTag)
+      socket.off('restart', onRestart)
     }
   }, [])
 

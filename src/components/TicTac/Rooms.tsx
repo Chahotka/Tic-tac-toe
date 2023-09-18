@@ -1,4 +1,5 @@
-import React, { useState, useContext } from 'react'
+// Количество игроков + на выход
+import React, { useState, useContext, useEffect } from 'react'
 import cl from '../../styles/rooms.module.css'
 import clBtn from '../../styles/button.module.css'
 import Modal from './Modal'
@@ -13,26 +14,45 @@ interface RoomsProps {
 
 const Rooms: React.FC<RoomsProps> = ({ reset }) => {
   const { room, setRoom } = useContext(FigureContext)
+  const [players, setPlayers] = useState(0)
   const [joined, setJoined] = useState(false)
   const [showModal, setShowModal] = useState(false)
 
   const joinRoom = (roomName: string) => {
     reset()
 
-    socket.emit('join room', roomName, () => {
-      setRoom(roomName)
-      setJoined(true)
+    socket.emit('join room', roomName, (players: number) => {
+      setPlayers(players)
     })
   }
 
   const leaveRoom = () => {
     reset()
 
-    socket.emit('leave room', room, () => {
-      setRoom(null)
-      setJoined(false)
-    })
+    socket.emit('leave room', room)
   }
+
+  useEffect(() => {
+    const onJoin = (room: string | null, joined: boolean) => {
+      setRoom(room)
+      setJoined(joined)
+      console.log(room, ' Joined: ', joined)
+    }
+    const onLeave = (room: null, joined: boolean) => {
+      setRoom(room)
+      setJoined(joined)
+      console.log(room, ' Joined: ', joined)
+      console.log(socket.id)
+    }
+
+    socket.on('joined', onJoin)
+    socket.on('left', onLeave)
+
+    return () => {
+      socket.off('joined', onJoin)
+      socket.off('left', onLeave)
+    }
+  }, [])
 
   return (
     <>
@@ -55,7 +75,7 @@ const Rooms: React.FC<RoomsProps> = ({ reset }) => {
                 className={cl.room}
                 onClick={() => joinRoom(room.name)}
               >
-                { room.name }
+                { room.name } |||| {`${players} / 2`}
               </li>
             )
           })}
