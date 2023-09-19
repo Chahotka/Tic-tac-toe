@@ -22,7 +22,7 @@ export const createStage = (): Stages =>
     ]
   ]
 
-export const rooms = [
+export const defRooms = [
   {name: 'Room 1', players: 0},
   {name: 'Room 2', players: 0},
   {name: 'Room 3', players: 0},

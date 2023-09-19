@@ -52,6 +52,9 @@ const TicTac: React.FC = () => {
   }
 
   useEffect(() => {
+    const onConnected = () => {
+      socket.emit('socket connected', {sopwt: 'Zalupa'})
+    }
     const onTag = (stage: Stages, tCount: number) => {
       setStage(stage)
       setTCount(tCount)
@@ -60,10 +63,12 @@ const TicTac: React.FC = () => {
       reset()
     }
   
+    socket.on('connect', onConnected)
     socket.on('get tagged', onTag)
     socket.on('restart', onRestart)
 
     return () => {
+      socket.off('connect', onConnected)
       socket.off('tag cell', onTag)
       socket.off('restart', onRestart)
     }

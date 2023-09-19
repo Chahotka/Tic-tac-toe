@@ -1,11 +1,12 @@
-// Количество игроков + на выход
+// Добавить ограничитель на комнаты
 import React, { useState, useContext, useEffect } from 'react'
 import cl from '../../styles/rooms.module.css'
 import clBtn from '../../styles/button.module.css'
 import Modal from './Modal'
-import { rooms } from '../../gameHelpers'
+import { defRooms } from '../../gameHelpers'
 import { socket } from '../../socket'
 import { FigureContext } from '../../context/FigureContext'
+import { Room } from '../../interfaces/RoomInterface'
 
 
 interface RoomsProps {
@@ -14,16 +15,14 @@ interface RoomsProps {
 
 const Rooms: React.FC<RoomsProps> = ({ reset }) => {
   const { room, setRoom } = useContext(FigureContext)
-  const [players, setPlayers] = useState(0)
+  const [rooms, setRooms] = useState<Room[]>(defRooms)
   const [joined, setJoined] = useState(false)
   const [showModal, setShowModal] = useState(false)
 
-  const joinRoom = (roomName: string) => {
+  const joinRoom = (roomName: string | null) => {
     reset()
 
-    socket.emit('join room', roomName, (players: number) => {
-      setPlayers(players)
-    })
+    socket.emit('join room', roomName)
   }
 
   const leaveRoom = () => {
@@ -33,10 +32,12 @@ const Rooms: React.FC<RoomsProps> = ({ reset }) => {
   }
 
   useEffect(() => {
-    const onJoin = (room: string | null, joined: boolean) => {
+    const onConnect = (newRooms: Room[]) => {
+      setRooms(newRooms)
+    }
+    const onJoin = (room: string | null, joined: boolean, ) => {
       setRoom(room)
       setJoined(joined)
-      console.log(room, ' Joined: ', joined)
     }
     const onLeave = (room: null, joined: boolean, id: string) => {
       if (socket.id === id) {
@@ -44,13 +45,28 @@ const Rooms: React.FC<RoomsProps> = ({ reset }) => {
         setJoined(joined)
       }
     }
+    const onSockets = (room: string, sockets: number) => {
+      const currentRoom: Room = rooms.filter(item => item.name === room)[0]
+      currentRoom.players = sockets
 
+      socket.emit('update rooms', rooms)
+    }
+    const onRooms = (updatedRooms: Room[]) => {
+      setRooms(updatedRooms)
+    }
+
+    socket.on('get info', onConnect)
     socket.on('joined', onJoin)
     socket.on('left', onLeave)
+    socket.on('get sockets', onSockets)
+    socket.on('get rooms', onRooms)
 
     return () => {
+      socket.off('get info', onConnect)
       socket.off('joined', onJoin)
       socket.off('left', onLeave)
+      socket.off('get sockets', onSockets)
+      socket.off('get rooms', onRooms)
     }
   }, [])
 
