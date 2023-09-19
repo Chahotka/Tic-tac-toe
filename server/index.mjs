@@ -57,8 +57,16 @@ io.on('connect', async(socket) => {
     io.to(`${socket.room}`).emit('restart')
   })
 
-  socket.on('disconnect', () => {
-    console.log(`${socket.name} logged out`)
+  socket.on('disconnect', async() => {
+    if (socket.room) {
+      console.log(socket.room)
+      socket.leave(socket.room)
+      
+      const sockets = await io.in(socket.room).fetchSockets()
+
+      io.emit('get sockets', socket.room, sockets.length)
+
+    }
   })
 })
 
