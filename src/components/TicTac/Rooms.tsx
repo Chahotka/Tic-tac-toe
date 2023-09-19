@@ -20,6 +20,12 @@ const Rooms: React.FC<RoomsProps> = ({ reset }) => {
   const [showModal, setShowModal] = useState(false)
 
   const joinRoom = (roomName: string | null) => {
+    const currentRoom = rooms.filter(room => room.name === roomName)[0]
+    
+    if (currentRoom.players === 2) {
+      return
+    }
+
     reset()
 
     socket.emit('join room', roomName)
