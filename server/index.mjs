@@ -57,18 +57,24 @@ io.on('connect', socket => {
     io.emit('updated rooms', io.rooms)
   })
 
+  socket.on('tag cell', ({room, stage, tCount}) => {
+    io.to(room).emit('cell tagged', stage, tCount)
+  })
+
+  socket.on('restart game', (room) => {
+    io.to(room).emit('game restarted')
+  })
+
   socket.on('disconnect', async() => {
-    socket.leave(socket.room)
+    if (socket.room) {
+      socket.leave(socket.room)
 
-    const sockets = await io.in(socket.room).fetchSockets()
+      const sockets = await io.in(socket.room).fetchSockets()
 
-    io.emit('room left', socket.room, socket.id, sockets.length)
+      io.emit('room left', io.rooms, socket.room, socket.id, sockets.length)
+    }
   })
 })
-
-
-
-
 
 httpServer.listen(5000, () => {
   console.log('Listening to 5000 bilya') 

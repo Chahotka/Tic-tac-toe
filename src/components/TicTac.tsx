@@ -4,16 +4,17 @@ import usePlayer from '../hooks/usePlayer'
 import Stage from './TicTac/Stage'
 import useGameover from '../hooks/useGameover'
 import Gameover from './TicTac/Gameover'
-import { createStage } from '../gameHelpers'
+import { Stages, createStage } from '../gameHelpers'
 import Rooms from './TicTac/Rooms'
 import { FigureContext } from '../context/FigureContext'
 import { socket } from '../socket'
+import Modal from './UI/Modal/Modal'
 
 const TicTac: React.FC = () => {
   const [tCount, setTCount] = useState(0)
   const { figure, setFigure, room } = useContext(FigureContext)
   const [showModal, setShowModal] = useState(true)
-  const {  updatePlayer } = usePlayer(figure, setFigure)
+  const { updatePlayer } = usePlayer(figure, setFigure)
   const { stage, setStage } = useStage(figure)
   const { gameover, setGameover } = useGameover(stage, tCount)
 
@@ -21,16 +22,15 @@ const TicTac: React.FC = () => {
     if (cell[1] === 'tagged' || gameover.over) {
       return
     }
-    
+
     updatePlayer()
     cell[0] = figure
     cell[1] = 'tagged'
     setTCount((prev: number) => prev += 1)
 
     if (room) {
-      socket.emit('tag cell', {stage, tCount: tCount + 1})
+      socket.emit('tag cell', { room, stage, tCount: tCount + 1 })
     }
-
   }
 
   const gameoverHandler = () => {
@@ -46,11 +46,26 @@ const TicTac: React.FC = () => {
     })
 
     if (room) {
-      socket.emit('restart game')
+      socket.emit('restart game', room)
     }
   }
 
   useEffect(() => {
+    const onTag = (stage: Stages, moveCount: number) => {
+      setStage(stage)
+      setTCount(moveCount)
+    }
+    const onRestart = () => {
+      reset()
+    }
+
+    socket.on('cell tagged', onTag)
+    socket.on('game restarted', onRestart)
+
+    return () => {
+      socket.off('cell tagged', onTag)
+      socket.off('game restarted', onRestart)
+    }
   }, [])
 
   return (
@@ -65,10 +80,9 @@ const TicTac: React.FC = () => {
         />
       } */}
       <div className="game">
-        <Stage stage={stage} tag={tag}/>
-        {
-          gameover.over && 
-          <Gameover 
+        <Stage stage={stage} tag={tag} />
+        {gameover.over &&
+          <Gameover
             reason={gameover.reason}
             gameoverHandler={gameoverHandler}
           />

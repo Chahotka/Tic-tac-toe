@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react'
-import cl from '../../styles/modal.module.css'
-import clBtn from '../../styles/button.module.css'
-import { socket } from '../../socket'
-import { v4 } from 'uuid'
+import React, { useState } from 'react'
+import cl from './modal.module.css'
+import { socket } from '../../../socket'
+import Button from '../Button/Button'
 
 interface ModalProps {
   type: string
@@ -13,16 +12,16 @@ interface ModalProps {
 }
 
 const Modal: React.FC<ModalProps> = ({
-    type,
-    labelText, 
-    btnText,
-    setShowModal, 
-    canExit
-  }) => {
-  const [name , setName] = useState('')
+  type,
+  labelText,
+  btnText,
+  setShowModal,
+  canExit
+}) => {
+  const [name, setName] = useState('')
   const [reason, setReason] = useState('')
 
-  const submitHandler = async(e: React.FormEvent) => {
+  const submitHandler = async (e: React.FormEvent) => {
     e.preventDefault()
     const stop = checkName()
     if (!stop) {
@@ -34,8 +33,8 @@ const Modal: React.FC<ModalProps> = ({
     } else if (type === 'create room') {
       socket.emit('create room', name)
     }
-    
-    
+
+
     setShowModal(false)
   }
 
@@ -49,7 +48,7 @@ const Modal: React.FC<ModalProps> = ({
       return false
     } else if (name.length > 20) {
       setReason('Name is too long')
-      return false 
+      return false
     } else {
       setReason('')
       return true
@@ -59,24 +58,23 @@ const Modal: React.FC<ModalProps> = ({
   return (
     <div className={cl.modalBg}>
       <form onSubmit={(e) => submitHandler(e)} className={cl.modal} autoComplete='off'>
-        <h1 className={cl.title}>{ labelText }:</h1>
-        <input 
-          id='modalInput' 
-          className={cl.input} 
-          type="text" 
+        <h1 className={cl.title}>{labelText}:</h1>
+        <input
+          id='modalInput'
+          className={cl.input}
+          type="text"
           value={name}
           maxLength={30}
           onChange={(e) => setName(e.target.value)}
         />
-        {canExit && 
-          <span 
+        {canExit &&
+          <span
             className={cl.close}
             onClick={closeModal}
           ></span>
         }
-        { reason && <p>{ reason }</p>}
-        <button 
-          className={[clBtn.button, cl.btn].join(' ')}>{ btnText }</button>
+        {reason && <p>{reason}</p>}
+        <Button text={btnText} action={submitHandler} />
       </form>
     </div>
   )
