@@ -4,8 +4,7 @@ import usePlayer from '../hooks/usePlayer'
 import Stage from './TicTac/Stage'
 import useGameover from '../hooks/useGameover'
 import Gameover from './TicTac/Gameover'
-import { Stages, createStage } from '../gameHelpers'
-import Modal from './TicTac/Modal'
+import { createStage } from '../gameHelpers'
 import Rooms from './TicTac/Rooms'
 import { FigureContext } from '../context/FigureContext'
 import { socket } from '../socket'
@@ -52,31 +51,11 @@ const TicTac: React.FC = () => {
   }
 
   useEffect(() => {
-    const onConnected = () => {
-      socket.emit('socket connected', {sopwt: 'Zalupa'})
-    }
-    const onTag = (stage: Stages, tCount: number) => {
-      setStage(stage)
-      setTCount(tCount)
-    }
-    const onRestart = () => {
-      reset()
-    }
-  
-    socket.on('connect', onConnected)
-    socket.on('get tagged', onTag)
-    socket.on('restart', onRestart)
-
-    return () => {
-      socket.off('connect', onConnected)
-      socket.off('tag cell', onTag)
-      socket.off('restart', onRestart)
-    }
   }, [])
 
   return (
     <>
-      { showModal && 
+      {/* { showModal && 
         <Modal 
           type='create player'
           labelText={'enter player name'} 
@@ -84,7 +63,7 @@ const TicTac: React.FC = () => {
           setShowModal={setShowModal} 
           canExit={false}
         />
-      }
+      } */}
       <div className="game">
         <Stage stage={stage} tag={tag}/>
         {

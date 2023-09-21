@@ -1,6 +1,7 @@
 import express from 'express'
 import { createServer } from 'http'
 import { Server } from 'socket.io'
+import { v4 } from 'uuid'
 
 const app = express()
 const httpServer = createServer(app)
@@ -11,62 +12,57 @@ const io = new Server(httpServer, {
 })
 
 
-io.on('connect', async(socket) => {
+io.on('connect', socket => {
+  if (!io.rooms) {
+    io.rooms = []
+  } else {
+    io.emit('socket connected', io.rooms, socket.id)
+  }
 
-  socket.on('socket connected', () => {
-    if (io.allRooms) {
-      io.emit('get info', io.allRooms)
-    }
-  })
-
-  socket.on('create player', name  => {
+  socket.on('create player', name => {
     socket.name = name
-    console.log(socket.id, ' 24')
   })
 
-  socket.on('join room', async(room) => {
-    socket.room = room
-    socket.join(room)
+  socket.on('create room', async(roomName) => {
+    socket.room = roomName
+    socket.join(roomName)
 
-    const sockets = await io.in(room).fetchSockets()
+    const sockets = await io.in(roomName).fetchSockets()
 
-    io.to(room).emit('joined', room, true)
-    io.emit('get sockets', room, sockets.length)
+    io.rooms.push({name: roomName, players: sockets.length, id: v4()})
+    io.emit('room created', io.rooms, roomName, socket.id)
   })
 
-  socket.on('leave room', async({room, id}) => {
+  socket.on('join room', async(roomName) => {
+    socket.room = roomName
+    socket.join(roomName)
+
+    const sockets = await io.in(roomName).fetchSockets()
+
+    io.emit('room joined', io.rooms, roomName, socket.id, sockets.length)
+  })
+
+  socket.on('leave room', async(roomName) => {
     socket.room = undefined
-    io.to(room).emit('left', null, false, id)
-    socket.leave(room)
+    socket.leave(roomName)
 
-    const sockets = await io.in(room).fetchSockets()
+    const sockets = await io.in(roomName).fetchSockets()
 
-    io.emit('get sockets', room, sockets.length)
+    io.emit('room left', io.rooms, roomName, socket.id, sockets.length)
   })
 
-  socket.on('update rooms', updatedRooms => {
-    io.allRooms = updatedRooms
-    io.emit('get rooms', updatedRooms)
-  })
+  socket.on('update rooms', rooms => {
+    io.rooms = rooms.filter(room => room.players !== 0)
 
-  socket.on('tag cell', ({stage, tCount}) => {
-    io.to(`${socket.room}`).emit('get tagged', stage, tCount)
-  })
-
-  socket.on('restart game', () => {
-    io.to(`${socket.room}`).emit('restart')
+    io.emit('updated rooms', io.rooms)
   })
 
   socket.on('disconnect', async() => {
-    if (socket.room) {
-      console.log(socket.room)
-      socket.leave(socket.room)
-      
-      const sockets = await io.in(socket.room).fetchSockets()
+    socket.leave(socket.room)
 
-      io.emit('get sockets', socket.room, sockets.length)
+    const sockets = await io.in(socket.room).fetchSockets()
 
-    }
+    io.emit('room left', socket.room, socket.id, sockets.length)
   })
 })
 

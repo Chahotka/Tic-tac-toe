@@ -3,7 +3,6 @@ import React, { useState, useContext, useEffect } from 'react'
 import cl from '../../styles/rooms.module.css'
 import clBtn from '../../styles/button.module.css'
 import Modal from './Modal'
-import { defRooms } from '../../gameHelpers'
 import { socket } from '../../socket'
 import { FigureContext } from '../../context/FigureContext'
 import { Room } from '../../interfaces/RoomInterface'
@@ -15,66 +14,79 @@ interface RoomsProps {
 
 const Rooms: React.FC<RoomsProps> = ({ reset }) => {
   const { room, setRoom } = useContext(FigureContext)
-  const [rooms, setRooms] = useState<Room[]>(defRooms)
+  const [rooms, setRooms] = useState<Room[]>([])
   const [joined, setJoined] = useState(false)
+  const [roomName, setRoomName] = useState('')
   const [showModal, setShowModal] = useState(false)
 
   const joinRoom = (roomName: string | null) => {
-    const currentRoom = rooms.filter(room => room.name === roomName)[0]
-    
-    if (currentRoom.players === 2) {
-      return
-    }
-
-    reset()
-
     socket.emit('join room', roomName)
   }
 
   const leaveRoom = () => {
-    reset()
+    socket.emit('leave room', room)
+  }
 
-    socket.emit('leave room', {room, id: socket.id})
+  const createRoom = () => {
+    setShowModal(true)
   }
 
   useEffect(() => {
-    const onConnect = (newRooms: Room[]) => {
-      setRooms(newRooms)
-    }
-    const onJoin = (room: string | null, joined: boolean, ) => {
-      setRoom(room)
-      setJoined(joined)
-    }
-    const onLeave = (room: null, joined: boolean, id: string) => {
-      if (socket.id === id) {
-        setRoom(room)
-        setJoined(joined)
+    const onConnected = (rooms: Room[], socketId: string) => {
+      if (socket.id === socketId) {
+        setRooms(rooms)
       }
     }
-    const onSockets = (room: string, sockets: number) => {
-      const currentRoom: Room = rooms.filter(item => item.name === room)[0]
-      currentRoom.players = sockets
+    const onJoin = (rooms: Room[], roomName: string, socketId: string, socketsInRoom: number) => {
+      if (socket.id === socketId) {
+        setRoom(roomName)
+        setJoined(true)
 
-      socket.emit('update rooms', rooms)
+        const currentRoom = rooms.filter(room => room.name === roomName)[0]
+        currentRoom.players = socketsInRoom
+
+        socket.emit('update rooms', rooms)
+      }
     }
-    const onRooms = (updatedRooms: Room[]) => {
+    const onLeave = (rooms: Room[], roomName: string, socketId: string, socketsInRoom: number) => {
+      if (socket.id === socketId) {
+        setRoom(null)
+        setJoined(false)
+
+        const currentRoom = rooms.filter(room => room.name === roomName)[0]
+        currentRoom.players = socketsInRoom
+
+        socket.emit('update rooms', rooms)
+      }
+    }
+    const onRoomsUpdate = (rooms: Room[]) => {
+      setRooms(rooms)
+
+      console.log(rooms)
+    }
+    const onCreateRoom = (updatedRooms: Room[], roomName: string, socketId: string) => {
+      if (socket.id === socketId) {
+        setRoom(roomName)
+        setJoined(true)
+      }
       setRooms(updatedRooms)
     }
 
-    socket.on('get info', onConnect)
-    socket.on('joined', onJoin)
-    socket.on('left', onLeave)
-    socket.on('get sockets', onSockets)
-    socket.on('get rooms', onRooms)
+    socket.on('socket connected', onConnected)
+    socket.on('room joined', onJoin)
+    socket.on('room left', onLeave)
+    socket.on('updated rooms', onRoomsUpdate)
+    socket.on('room created', onCreateRoom)
 
     return () => {
-      socket.off('get info', onConnect)
-      socket.off('joined', onJoin)
-      socket.off('left', onLeave)
-      socket.off('get sockets', onSockets)
-      socket.off('get rooms', onRooms)
+      socket.off('connected', onConnected)
+      socket.off('room joined', onJoin)
+      socket.off('room left', onLeave)
+      socket.off('updated rooms', onRoomsUpdate)
+      socket.off('room created', onCreateRoom)
     }
   }, [])
+
 
   return (
     <>
@@ -87,6 +99,16 @@ const Rooms: React.FC<RoomsProps> = ({ reset }) => {
           setShowModal={setShowModal}
           canExit={true}
         />
+      }
+      {!joined &&
+        <button 
+          className={
+            [cl.button, clBtn.button].join(' ')
+          }
+          onClick={createRoom}
+        >
+          Create room
+        </button>
       }
       {!joined &&
         <ul className={cl.rooms}>

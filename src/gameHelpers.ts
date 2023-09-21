@@ -22,13 +22,6 @@ export const createStage = (): Stages =>
     ]
   ]
 
-export const defRooms = [
-  {name: 'Room 1', players: 0},
-  {name: 'Room 2', players: 0},
-  {name: 'Room 3', players: 0},
-  {name: 'Room 4', players: 0},
-  {name: 'Room 5', players: 0}
-]
 
 export const checkGameover = (
   stage: Stages,

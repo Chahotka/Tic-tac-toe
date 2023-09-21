@@ -28,8 +28,13 @@ const Modal: React.FC<ModalProps> = ({
     if (!stop) {
       return
     }
+
+    if (type === 'create player') {
+      socket.emit('create player', name)
+    } else if (type === 'create room') {
+      socket.emit('create room', name)
+    }
     
-    socket.emit('create player', name)
     
     setShowModal(false)
   }
