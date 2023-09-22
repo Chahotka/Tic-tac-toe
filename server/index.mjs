@@ -32,13 +32,29 @@ io.on('connect', socket => {
     io.rooms.push({name: roomName, players: sockets.length, id: v4()})
     io.emit('room created', io.rooms, roomName, socket.id)
   })
-
+ 
   socket.on('join room', async(roomName) => {
     socket.room = roomName
     socket.join(roomName)
 
     const sockets = await io.in(roomName).fetchSockets()
 
+    if (sockets.length === 2) {
+      sockets[0].figure = 'x'
+      sockets[1].figure = 'o'
+
+      io.emit('game started', 
+        {
+          id: sockets[0].id,
+          figure: sockets[0].figure
+        },
+        {
+          id: sockets[1].id,
+          figure: sockets[1].figure
+        }
+      )
+    }
+    
     io.emit('room joined', io.rooms, roomName, socket.id, sockets.length)
   })
 
@@ -57,8 +73,9 @@ io.on('connect', socket => {
     io.emit('updated rooms', io.rooms)
   })
 
-  socket.on('tag cell', ({room, stage, tCount}) => {
-    io.to(room).emit('cell tagged', stage, tCount)
+  socket.on('tag cell', ({room, stage, tCount, turn}) => {
+    console.log(turn)
+    io.to(room).emit('cell tagged', stage, tCount, turn)
   })
 
   socket.on('restart game', (room) => {

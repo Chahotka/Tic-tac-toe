@@ -5,7 +5,9 @@ export const FigureContext = createContext<ContextInterface>({
   room: null,
   setRoom: () => {},
   figure: 'x',
-  setFigure: () => {}
+  setFigure: () => {},
+  turn: 'x',
+  setTurn: () => {}
 })
 
 interface ProviderProps {
@@ -15,6 +17,7 @@ interface ProviderProps {
 const FigureProvider: React.FC<ProviderProps> = ({children}) => {
   const [room, setRoom] = useState<string | null>(null)
   const [figure, setFigure] = useState<TFigure>('x')
+  const [turn, setTurn] = useState<TFigure>('x')
 
   return (
     <FigureContext.Provider
@@ -22,7 +25,9 @@ const FigureProvider: React.FC<ProviderProps> = ({children}) => {
         room,
         setRoom,
         figure,
-        setFigure
+        setFigure,
+        turn, 
+        setTurn
       }}
     >
       { children }
