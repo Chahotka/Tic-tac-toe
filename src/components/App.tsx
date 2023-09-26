@@ -1,8 +1,10 @@
 import { useEffect } from "react";
-import FigureProvider from "../context/FigureContext";
 import TicTac from "./TicTac";
 import { socket } from "../socket";
-
+import { FigureProvider } from "../context/FigureContext";
+import { TurnProvider } from "../context/TurnContext";
+import { RoomProvider } from "../context/RoomContext";
+import { PlayerProvider } from "../context/PlayerContext";
 
 function App() {
   useEffect(() => {
@@ -11,9 +13,15 @@ function App() {
 
   return (
     <>
-      <FigureProvider>
-        <TicTac />
-      </FigureProvider>
+      <PlayerProvider>
+        <RoomProvider>
+          <FigureProvider>
+            <TurnProvider>
+              <TicTac />
+            </TurnProvider>
+          </FigureProvider>
+        </RoomProvider>
+      </PlayerProvider>
     </>
   )
 }

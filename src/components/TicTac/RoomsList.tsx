@@ -1,25 +1,26 @@
 import React from 'react'
 import cl from '../../styles/rooms.module.css'
-import { Room } from '../../interfaces/RoomInterface'
+import { Room } from '../../interfaces/RoomConInterface'
+import { v4 } from 'uuid'
 
 interface RoomsProps {
   rooms: Room[]
   join: Function
 }
 
-const RoomsList: React.FC<RoomsProps> = ({rooms, join}) => {
+const RoomsList: React.FC<RoomsProps> = ({ rooms, join }) => {
 
   return (
     <>
       <ul className={cl.rooms}>
         {rooms.map(room => {
           return (
-            <li 
-              key={room.name}
+            <li
+              key={v4()}
               className={cl.room}
-              onClick={() => join(room.name)}
+              onClick={() => join(room.roomName)}
             >
-              { room.name } |||| {`${room.players} / 2`}
+              {room.roomName} |||| {`${room.players} / 2`}
             </li>
           )
         })}

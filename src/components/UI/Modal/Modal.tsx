@@ -31,6 +31,7 @@ const Modal: React.FC<ModalProps> = ({
     if (type === 'create player') {
       socket.emit('create player', name)
     } else if (type === 'create room') {
+      console.log('blya', name)
       socket.emit('create room', name)
     }
 

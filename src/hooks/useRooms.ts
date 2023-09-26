@@ -1,28 +1,29 @@
-import { useState, useEffect, useContext } from 'react'
-import { Room } from '../interfaces/RoomInterface'
+import { useState, useEffect } from 'react'
+import { Room } from '../interfaces/RoomConInterface'
 import { socket } from '../socket'
-import { FigureContext } from '../context/FigureContext'
+import { useRoomContext } from '../context/RoomContext'
 
 const useRooms = (
-    reset: Function
-  ) => {
-  const { room, setRoom } = useContext(FigureContext)
+  reset: Function,
+  setGameStarted: React.Dispatch<React.SetStateAction<boolean>>
+) => {
+  const { roomName, setRoomName, setPlayers } = useRoomContext()
   const [rooms, setRooms] = useState<Room[]>([])
-  const [joined, setJoined] = useState(false)
   const [showModal, setShowModal] = useState(false)
 
 
   const joinRoom = (roomName: string | null) => {
-    const currentRoom: Room = rooms.filter(room => room.name === roomName)[0]
+    const currentRoom: Room = rooms.filter(room => room.roomName === roomName)[0]
     if (currentRoom.players === 2) {
       return
     }
 
+    setRoomName(roomName)
     socket.emit('join room', roomName)
   }
 
   const leaveRoom = () => {
-    socket.emit('leave room', room)
+    socket.emit('leave room', roomName)
   }
 
   const createRoom = () => {
@@ -32,29 +33,35 @@ const useRooms = (
   useEffect(() => {
     const onConnected = (rooms: Room[], socketId: string) => {
       if (socket.id === socketId) {
-        setRooms(rooms)
+        socket.emit('update rooms', rooms)
       }
     }
     const onJoin = (rooms: Room[], roomName: string, socketId: string, socketsInRoom: number) => {
-      reset()
+      reset(true)
       if (socket.id === socketId) {
-        setRoom(roomName)
-        setJoined(true)
-
-        const currentRoom: Room = rooms.filter(room => room.name === roomName)[0]
+        const currentRoom: Room = rooms.filter(room => room.roomName === roomName)[0]
         currentRoom.players = socketsInRoom
+
+
+        if (currentRoom.players === 2) {
+          setGameStarted(true)
+        }
 
         socket.emit('update rooms', rooms)
       }
     }
     const onLeave = (rooms: Room[], roomName: string, socketId: string, socketsInRoom: number) => {
-      reset()
+      reset(true)
       if (socket.id === socketId) {
-        setRoom(null)
-        setJoined(false)
+        setRoomName(null)
       }
-      const currentRoom: Room = rooms.filter(room => room.name === roomName)[0]
+
+      const currentRoom: Room = rooms.filter(room => room.roomName === roomName)[0]
       currentRoom.players = socketsInRoom
+
+      if (currentRoom.players !== 2) {
+        setGameStarted(false)
+      }
 
       socket.emit('update rooms', rooms)
     }
@@ -62,10 +69,11 @@ const useRooms = (
       setRooms(rooms)
     }
     const onCreateRoom = (updatedRooms: Room[], roomName: string, socketId: string) => {
+      console.log(updatedRooms, roomName, socketId)
       if (socket.id === socketId) {
-        setRoom(roomName)
-        setJoined(true)
+        setRoomName(roomName)
       }
+      reset(true)
       setRooms(updatedRooms)
     }
 
@@ -84,15 +92,15 @@ const useRooms = (
     }
   }, [])
 
-  return { 
-    joinRoom, 
-    leaveRoom, 
-    createRoom, 
-    rooms, 
-    showModal, 
-    setShowModal, 
-    joined, 
-    setJoined 
+  console.log(roomName)
+  console.log(rooms)
+  return {
+    joinRoom,
+    leaveRoom,
+    createRoom,
+    rooms,
+    showModal,
+    setShowModal,
   }
 }
 

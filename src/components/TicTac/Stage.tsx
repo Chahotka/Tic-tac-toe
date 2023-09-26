@@ -6,6 +6,7 @@ import Cell from './Cell'
 interface StageProps {
   stage: Stages
   tag: Function
+  gameStarted: boolean
 }
 
 const Stage: React.FC<StageProps> = ({stage, tag}) => {

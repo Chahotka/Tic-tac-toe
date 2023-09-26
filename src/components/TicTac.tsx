@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import useStage from '../hooks/useStage'
 import usePlayer from '../hooks/usePlayer'
 import Stage from './TicTac/Stage'
@@ -6,25 +6,35 @@ import useGameover from '../hooks/useGameover'
 import Gameover from './TicTac/Gameover'
 import { Stages, createStage } from '../gameHelpers'
 import Rooms from './TicTac/Rooms'
-import { FigureContext } from '../context/FigureContext'
 import { socket } from '../socket'
 import Modal from './UI/Modal/Modal'
-import { PlayerInterface } from '../interfaces/PlayerInterface'
+import { useFigureContext } from '../context/FigureContext'
+import { useTurnContext } from '../context/TurnContext'
+import { useRoomContext } from '../context/RoomContext'
+import { Player } from '../interfaces/PlayerConInterface'
 
 const TicTac: React.FC = () => {
   const [tCount, setTCount] = useState(0)
-  const { room, figure, setFigure, turn, setTurn } = useContext(FigureContext)
   const [showModal, setShowModal] = useState(true)
-  const { updatePlayer } = usePlayer(room, turn, setTurn, figure, setFigure)
+  const [playerName, setPlayerName] = useState('')
+  const [gameStarted, setGameStarted] = useState(false)
+
+  const { roomName } = useRoomContext()
+  const { turn, setTurn} = useTurnContext()
+  const { figure, setFigure } = useFigureContext()
+
   const { stage, setStage } = useStage(figure)
   const { gameover, setGameover } = useGameover(stage, tCount)
+  const { updatePlayer } = usePlayer(roomName, turn, setTurn, figure, setFigure)
 
   const tag = (cell: [string | number, string]) => {
     if (cell[1] === 'tagged' || gameover.over) {
       return
     }
-    if (turn !== figure) {
-      return
+    if (roomName) {
+      if (turn !== figure || !gameStarted) {
+        return
+      }
     }
 
     updatePlayer()
@@ -33,17 +43,16 @@ const TicTac: React.FC = () => {
     cell[1] = 'tagged'
     setTCount(tCount + 1)
 
-    if (room) {
-      socket.emit('tag cell', { room, stage, tCount: tCount + 1, turn })
+    if (roomName) {
+      socket.emit('tag cell', { roomName, stage, tCount: tCount + 1, turn })
     }
   }
-  console.log(turn)
 
   const gameoverHandler = () => {
     reset()
   }
 
-  const reset = () => {
+  const reset = (figure?: boolean) => {
     setTCount(0)
     setStage(createStage())
     setGameover({
@@ -51,53 +60,68 @@ const TicTac: React.FC = () => {
       reason: null
     })
 
-    if (room) {
-      socket.emit('restart game', room)
+    if (figure) {
+      setFigure('x')
+      setTurn('x')
+    }
+    if (roomName) {
+      socket.emit('restart game', roomName)
     }
   }
 
   useEffect(() => {
+    const onPlayer = (name: string, socketId: string) => {
+      if (socket.id === socketId) {
+        setPlayerName(name)
+      }
+    }
     const onTag = (stage: Stages, moveCount: number, turn: string) => {
       setStage(stage)
       setTCount(moveCount)
       turn === 'x' ? setTurn('o') : setTurn('x')
     }
-    const onStarted = (player1: PlayerInterface, player2: PlayerInterface) => {
-      if (socket.id === player1.id) {
-        setFigure(player1.figure)
-      } else if (socket.id === player2.id) {
-        setFigure(player2.figure)
-      }
+    const onStarted = async(players: Player[]) => {
+      players.forEach(player => {
+        if (player.id === socket.id) {
+          console.log(player.name)
+          setFigure(player.figure)
+        }
+      })
     }
     const onRestart = () => {
       reset()
     }
 
+    socket.on('player created', onPlayer)
     socket.on('cell tagged', onTag)
     socket.on('game started', onStarted)
     socket.on('game restarted', onRestart)
 
     return () => {
+      socket.off('player created', onPlayer)
       socket.off('cell tagged', onTag)
       socket.off('game started', onStarted)
       socket.off('game restarted', onRestart)
     }
   }, [])
 
+  console.log(playerName)
+
   return (
     <>
-      {/* { showModal && 
+      { showModal && 
         <Modal 
           type='create player'
           labelText={'enter player name'} 
-          btnText={'save'} 
+          btnText={'save'}
           setShowModal={setShowModal} 
           canExit={false}
         />
-      } */}
+      }
       <div className="game">
-        <Stage stage={stage} tag={tag} />
-        {turn}
+        <span>Player name: { playerName && playerName }; Figure: {figure}</span>
+        <Stage stage={stage} tag={tag} gameStarted={gameStarted}/>
+        <span>Current move: { turn }</span>
         {gameover.over &&
           <Gameover
             reason={gameover.reason}
@@ -106,7 +130,7 @@ const TicTac: React.FC = () => {
         }
       </div>
       <aside className="aside">
-        <Rooms reset={reset} />
+        <Rooms reset={reset} setGameStarted={setGameStarted}/>
       </aside>
     </>
   )

@@ -28,7 +28,6 @@ body {
   width: 100%;
   height: 100%;
   display: grid;
-  grid-template-rows: minmax(10px, 1fr) 200px;
 }
 
 * {

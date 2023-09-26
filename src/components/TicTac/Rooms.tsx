@@ -1,21 +1,19 @@
 // Добавить ограничитель на комнаты
-import React, { useState, useContext } from 'react'
-import cl from '../../styles/rooms.module.css'
+import React from 'react'
 import Modal from '../UI/Modal/Modal'
-import { socket } from '../../socket'
-import { FigureContext } from '../../context/FigureContext'
-import { Room } from '../../interfaces/RoomInterface'
 import useRooms from '../../hooks/useRooms'
 import RoomsList from './RoomsList'
 import Button from '../UI/Button/Button'
+import { useRoomContext } from '../../context/RoomContext'
 
 
 interface RoomsProps {
   reset: Function
+  setGameStarted: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-const Rooms: React.FC<RoomsProps> = ({ reset }) => {
-  const { room, setRoom } = useContext(FigureContext)
+const Rooms: React.FC<RoomsProps> = ({ reset, setGameStarted }) => {
+  const { roomName } = useRoomContext()
   const {
     joinRoom,
     leaveRoom,
@@ -23,9 +21,8 @@ const Rooms: React.FC<RoomsProps> = ({ reset }) => {
     rooms,
     showModal,
     setShowModal,
-    joined,
-    setJoined
-  } = useRooms(reset)
+  } = useRooms(reset, setGameStarted)
+
 
   return (
     <>
@@ -38,20 +35,20 @@ const Rooms: React.FC<RoomsProps> = ({ reset }) => {
           canExit={true}
         />
       }
-      {!joined &&
+      {!roomName &&
         <Button
           text='Create Room'
           action={createRoom}
           styles={{ width: '100%' }}
         />
       }
-      {!joined &&
+      {!roomName &&
         <RoomsList
           rooms={rooms}
           join={joinRoom}
         />
       }
-      {joined &&
+      {roomName &&
         <Button
           text='Leave Room'
           action={leaveRoom}

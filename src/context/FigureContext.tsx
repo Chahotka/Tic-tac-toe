@@ -1,38 +1,23 @@
-import { createContext, useState } from 'react'
-import { ContextInterface, TFigure } from '../interfaces/ContextInterface'
+import React, { useState, createContext, useContext } from 'react'
+import { FigureConInterface, Figure } from '../interfaces/FigureConInterface'
 
-export const FigureContext = createContext<ContextInterface>({
-  room: null,
-  setRoom: () => {},
+const FigureContext = createContext<FigureConInterface>({
   figure: 'x',
   setFigure: () => {},
-  turn: 'x',
-  setTurn: () => {}
 })
 
-interface ProviderProps {
+export const useFigureContext = () => useContext(FigureContext)
+
+interface FigureProps {
   children: React.ReactNode
 }
 
-const FigureProvider: React.FC<ProviderProps> = ({children}) => {
-  const [room, setRoom] = useState<string | null>(null)
-  const [figure, setFigure] = useState<TFigure>('x')
-  const [turn, setTurn] = useState<TFigure>('x')
+export const FigureProvider: React.FC<FigureProps> = ({ children }) => {
+  const [figure, setFigure] = useState<Figure>('x')
 
   return (
-    <FigureContext.Provider
-      value={{
-        room,
-        setRoom,
-        figure,
-        setFigure,
-        turn, 
-        setTurn
-      }}
-    >
-      { children }
+    <FigureContext.Provider value={{ figure, setFigure }}>
+      {children}
     </FigureContext.Provider>
   )
 }
-
-export default FigureProvider
