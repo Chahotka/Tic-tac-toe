@@ -37,14 +37,14 @@ const useRooms = (
       }
     }
     const onJoin = (rooms: Room[], roomName: string, socketId: string, socketsInRoom: number) => {
-      reset(true)
+      reset()
       if (socket.id === socketId) {
         const currentRoom: Room = rooms.filter(room => room.roomName === roomName)[0]
         currentRoom.players = socketsInRoom
 
 
         if (currentRoom.players === 2) {
-          setGameStarted(true)
+          console.log(currentRoom)
         }
 
         socket.emit('update rooms', rooms)
@@ -92,8 +92,6 @@ const useRooms = (
     }
   }, [])
 
-  console.log(roomName)
-  console.log(rooms)
   return {
     joinRoom,
     leaveRoom,

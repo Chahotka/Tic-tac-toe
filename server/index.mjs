@@ -83,7 +83,8 @@ io.on('connect', async socket => {
     io.emit('updated rooms', io.rooms)
   })
 
-  socket.on('tag cell', ({room, stage, tCount, turn}) => {
+  socket.on('tag cell', (room, stage, tCount, turn) => {
+    console.log(room)
     io.to(room).emit('cell tagged', stage, tCount, turn)
   })
 
