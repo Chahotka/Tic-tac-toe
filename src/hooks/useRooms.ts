@@ -2,14 +2,17 @@ import { useState, useEffect } from 'react'
 import { Room } from '../interfaces/RoomConInterface'
 import { socket } from '../socket'
 import { useRoomContext } from '../context/RoomContext'
+import { usePlayerContext } from '../context/PlayerContext'
 
 const useRooms = (
   reset: Function,
   setGameStarted: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
-  const { roomName, setRoomName, setPlayers } = useRoomContext()
   const [rooms, setRooms] = useState<Room[]>([])
   const [showModal, setShowModal] = useState(false)
+
+  const { lobby, setLobby } = usePlayerContext()
+  const { roomName, setRoomName, setPlayers } = useRoomContext()
 
 
   const joinRoom = (roomName: string | null) => {
@@ -23,6 +26,7 @@ const useRooms = (
   }
 
   const leaveRoom = () => {
+    setLobby(null)
     socket.emit('leave room', roomName)
   }
 
@@ -37,21 +41,28 @@ const useRooms = (
       }
     }
     const onJoin = (rooms: Room[], roomName: string, socketId: string, socketsInRoom: number) => {
-      reset()
+      if (lobby) {
+        lobby.forEach(player => {
+          if (socket.id === player.id) {
+            reset()
+          }
+        })
+      }
       if (socket.id === socketId) {
         const currentRoom: Room = rooms.filter(room => room.roomName === roomName)[0]
         currentRoom.players = socketsInRoom
-
-
-        if (currentRoom.players === 2) {
-          console.log(currentRoom)
-        }
 
         socket.emit('update rooms', rooms)
       }
     }
     const onLeave = (rooms: Room[], roomName: string, socketId: string, socketsInRoom: number) => {
-      reset(true)
+      if (lobby) {
+        lobby.forEach(player => {
+          if (socket.id === player.id) {
+            reset(true)
+          }
+        })
+      }
       if (socket.id === socketId) {
         setRoomName(null)
       }

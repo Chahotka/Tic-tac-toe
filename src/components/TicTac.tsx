@@ -12,6 +12,7 @@ import { useFigureContext } from '../context/FigureContext'
 import { useTurnContext } from '../context/TurnContext'
 import { useRoomContext } from '../context/RoomContext'
 import { Player } from '../interfaces/PlayerConInterface'
+import { usePlayerContext } from '../context/PlayerContext'
 
 const TicTac: React.FC = () => {
   const [tCount, setTCount] = useState(0)
@@ -21,6 +22,7 @@ const TicTac: React.FC = () => {
 
   const { roomName } = useRoomContext()
   const { turn, setTurn} = useTurnContext()
+  const { lobby, setLobby} = usePlayerContext()
   const { figure, setFigure } = useFigureContext()
 
   const { stage, setStage } = useStage(figure)
@@ -31,6 +33,7 @@ const TicTac: React.FC = () => {
     if (cell[1] === 'tagged' || gameover.over) {
       return
     }
+    console.log(turn, figure, gameStarted)
     if (roomName) {
       if (turn !== figure || !gameStarted) {
         console.log('blya')
@@ -65,9 +68,7 @@ const TicTac: React.FC = () => {
     if (figure) {
       setFigure('x')
       setTurn('x')
-      console.log('asdfa')
     }
-    console.log('asdfa')
     if (roomName) {
       socket.emit('restart game', roomName)
     }
@@ -85,7 +86,6 @@ const TicTac: React.FC = () => {
       turn === 'x' ? setTurn('o') : setTurn('x')
     }
     const onStarted = async(players: Player[]) => {
-      console.log(players)
       players.forEach(player => {
         if (player.id === socket.id) {
           console.log(player.name, ' - ', player.figure)
@@ -93,9 +93,11 @@ const TicTac: React.FC = () => {
           setGameStarted(true)
         }
       })
+      setLobby(players)
     }
     const onRestart = () => {
       reset()
+      console.log('reset')
     }
 
     socket.on('player created', onPlayer)

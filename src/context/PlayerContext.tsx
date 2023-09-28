@@ -1,9 +1,11 @@
 import { useState, createContext, useContext } from 'react'
-import { PlayerConInterface } from '../interfaces/PlayerConInterface'
+import { Player, PlayerConInterface } from '../interfaces/PlayerConInterface'
 
 const PlayerContext = createContext<PlayerConInterface>({
   playerName: null,
-  setPlayerName: () => {}
+  setPlayerName: () => {},
+  lobby: null,
+  setLobby: () => {}
 })
 
 export const usePlayerContext = () => useContext(PlayerContext)
@@ -14,9 +16,17 @@ interface PlayerProps {
 
 export const PlayerProvider: React.FC<PlayerProps> = ({children}) => {
   const [playerName, setPlayerName] = useState<string | null>(null)
+  const [lobby, setLobby] = useState<Player[] | null>(null)
 
   return (
-    <PlayerContext.Provider value={{playerName, setPlayerName}}>
+    <PlayerContext.Provider 
+      value={{
+        playerName, 
+        setPlayerName,
+        lobby,
+        setLobby
+      }}
+    >
       { children }
     </PlayerContext.Provider>
   )

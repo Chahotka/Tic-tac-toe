@@ -10,5 +10,7 @@ export interface Player {
 export interface PlayerConInterface {
   playerName: string | null
   setPlayerName: Dispatch<SetStateAction<string | null>>
+  lobby: Player[] | null
+  setLobby: Dispatch<SetStateAction<Player[]| null>>
 }
 
