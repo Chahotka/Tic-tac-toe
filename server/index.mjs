@@ -7,7 +7,7 @@ const app = express()
 const httpServer = createServer(app)
 const io = new Server(httpServer, {
   cors: {
-    origin: 'https://chahotka.github.io/Tic-tac-toe'
+    origin: 'http://localhost:3000'
   }
 })
 
@@ -15,7 +15,7 @@ const io = new Server(httpServer, {
 io.on('connect', async socket => {
   const sockets = await io.sockets.fetchSockets()
   if (!io.rooms) {
-    io.rooms = [{roomName: 'Zig', players: 1}]
+    io.rooms = []
   } else {
     if (sockets.length === 1) {
       socket.emit('socket connected', [], socket.id)
@@ -52,6 +52,7 @@ io.on('connect', async socket => {
     const currentRoom = io.rooms.filter(room => room.roomName === roomName)[0]
     currentRoom.players = sockets.length
 
+    io.to(roomName).emit('reset stage')
     io.emit('socket joined', io.rooms, socket.id)
 
     if (sockets.length === 2) {
@@ -71,6 +72,7 @@ io.on('connect', async socket => {
     const currentRoom = io.rooms.filter(room => room.roomName === roomName)[0]
     currentRoom.players = sockets.length
 
+    io.to(roomName).emit('reset stage')
     io.emit('socket left', io.rooms, socket.id, roomName)
   })
 
@@ -92,6 +94,7 @@ io.on('connect', async socket => {
     const currentRoom = io.rooms.filter(room => room.roomName === socket.room)[0]
     currentRoom.players = sockets.length
 
+    io.to(socket.room).emit('reset stage')
     io.emit('socket left', io.rooms, socket.id, socket.room)
   })
 })

@@ -12,7 +12,7 @@ const useRooms = (
   const [showModal, setShowModal] = useState(false)
 
   const { lobby, setLobby } = usePlayerContext()
-  const { roomName, setRoomName, setPlayers } = useRoomContext()
+  const { roomName, setRoomName } = useRoomContext()
 
 
   const joinRoom = (roomName: string | null) => {
@@ -31,6 +31,7 @@ const useRooms = (
     socket.emit('leave room', roomName)
 
     reset()
+    
     setRoomName(null)
   }
 
@@ -70,6 +71,8 @@ const useRooms = (
       socket.off('socket left', onLeft)
   }
   })
+
+  console.log(lobby)
 
   return {
     joinRoom,

@@ -13,16 +13,16 @@ import { useTurnContext } from '../context/TurnContext'
 import { useRoomContext } from '../context/RoomContext'
 import { Player } from '../interfaces/PlayerConInterface'
 import { usePlayerContext } from '../context/PlayerContext'
+import GameInfo from './TicTac/GameInfo'
 
 const TicTac: React.FC = () => {
   const [tCount, setTCount] = useState(0)
   const [showModal, setShowModal] = useState(true)
-  const [playerName, setPlayerName] = useState('')
   const [gameStarted, setGameStarted] = useState(false)
 
   const { roomName } = useRoomContext()
   const { turn, setTurn} = useTurnContext()
-  const { lobby, setLobby} = usePlayerContext()
+  const { setPlayerName, setLobby} = usePlayerContext()
   const { figure, setFigure } = useFigureContext()
 
   const { updatePlayer } = usePlayer()
@@ -57,14 +57,14 @@ const TicTac: React.FC = () => {
   }
 
   const reset = () => {
-    if (!roomName) {
-      setTCount(0)
-      setStage(createStage())
-      setGameover({
-        over: false,
-        reason: null
-      })
-    } else {
+    setTCount(0)
+    setStage(createStage())
+    setGameover({
+      over: false,
+      reason: null
+    })
+    if (roomName) {
+      setGameStarted(false)
       socket.emit('restart game')
     }
   }
@@ -82,27 +82,33 @@ const TicTac: React.FC = () => {
         }
       })
     }
+    const onStopped = () => {
+      reset()
+    }
+    const onRestarted = () => {
+      reset()
+    }
     const onTagged = (stage: Stages, tCount: number, turn: 'x' | 'o') => {
       setStage(stage)
       setTCount(tCount)
       setTurn(turn)
-    }
-    const onRestarted = () => {
-      reset()
     }
 
     socket.on('player created', onCreate)
     socket.on('game started', onStarted)
     socket.on('cell tagged', onTagged)
     socket.on('game restarted', onRestarted)
+    socket.on('reset stage', onStopped)
 
     return () => {
       socket.off('player created', onCreate)
       socket.off('game started', onStarted)
       socket.off('cell tagged', onTagged)
       socket.off('game restarted', onRestarted)
+      socket.on('reset stage', onStopped)
     }
   }, [])
+
 
   return (
     <>
@@ -116,11 +122,8 @@ const TicTac: React.FC = () => {
         />
       }
       <div className="game">
-        {gameStarted ? 'started' : 'not started'}
-        <span>Player name: { playerName && playerName }; Figure: {figure}</span>
-        <span>Room name: { roomName && roomName }</span>
+        <GameInfo />
         <Stage stage={stage} tag={tag} gameStarted={gameStarted}/>
-        <span>Current move: { turn }</span>
         {gameover.over &&
           <Gameover
             reason={gameover.reason}

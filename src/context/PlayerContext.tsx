@@ -18,6 +18,8 @@ export const PlayerProvider: React.FC<PlayerProps> = ({children}) => {
   const [playerName, setPlayerName] = useState<string | null>(null)
   const [lobby, setLobby] = useState<Player[] | null>(null)
 
+  console.log(playerName)
+
   return (
     <PlayerContext.Provider 
       value={{
