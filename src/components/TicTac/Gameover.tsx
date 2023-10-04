@@ -1,6 +1,5 @@
 import React from 'react'
 import cl from '../../styles/gameover.module.css'
-import clBtn from '../../styles/button.module.css'
 import Button from '../UI/Button/Button'
 
 interface GameoverProps {

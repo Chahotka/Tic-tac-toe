@@ -1,25 +1,21 @@
-import { Dispatch, SetStateAction } from 'react'
-import { Figure } from '../interfaces/FigureConInterface'
-import { Turn } from '../interfaces/TurnConInterface'
+import { useFigureContext } from "../context/FigureContext"
+import { useRoomContext } from "../context/RoomContext"
+import { useTurnContext } from "../context/TurnContext"
 
-const usePlayer =
-  (
-    room: string | null,
-    turn: Figure,
-    setTurn: Dispatch<SetStateAction<Figure>>,
-    figure: Turn,
-    setFigure: Dispatch<SetStateAction<Turn>>
-  ) => {
 
-    const updatePlayer = () => {
-      if (!room) {
-        figure === 'x' ? setFigure('o') : setFigure('x')
-      }
-      turn === 'x' ? setTurn('o') : setTurn('x')
+const usePlayer = () => {
+  const { roomName } = useRoomContext()
+  const { turn, setTurn } = useTurnContext()
+  const { figure, setFigure } = useFigureContext()
+
+  const updatePlayer = () => {
+    if (!roomName) {
+      figure === 'x' ? setFigure('o') : setFigure('x')
     }
-
-
-    return { updatePlayer }
+    turn === 'x' ? setTurn('o') : setTurn('x')
   }
+
+  return { updatePlayer }
+}
 
 export default usePlayer

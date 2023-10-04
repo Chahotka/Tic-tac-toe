@@ -25,20 +25,16 @@ const TicTac: React.FC = () => {
   const { lobby, setLobby} = usePlayerContext()
   const { figure, setFigure } = useFigureContext()
 
+  const { updatePlayer } = usePlayer()
   const { stage, setStage } = useStage(figure)
   const { gameover, setGameover } = useGameover(stage, tCount)
-  const { updatePlayer } = usePlayer(roomName, turn, setTurn, figure, setFigure)
 
   const tag = (cell: [string | number, string]) => {
     if (cell[1] === 'tagged' || gameover.over) {
       return
     }
-    console.log(turn, figure, gameStarted)
-    if (roomName) {
-      if (turn !== figure || !gameStarted) {
-        console.log('blya')
-        return
-      }
+    if (roomName && !gameStarted || (turn !== figure)) {
+      return
     }
 
     updatePlayer()
@@ -48,8 +44,11 @@ const TicTac: React.FC = () => {
     setTCount(tCount + 1)
 
     if (roomName) {
-      console.log('tag in: ', roomName)
-      socket.emit('tag cell',  roomName, stage, tCount + 1, turn)
+      socket.emit('tag cell', 
+        stage, 
+        tCount + 1, 
+        turn === 'x' ? 'o' : 'x'
+      )
     }
   }
 
@@ -57,59 +56,51 @@ const TicTac: React.FC = () => {
     reset()
   }
 
-  const reset = (figure?: boolean) => {
-    setTCount(0)
-    setStage(createStage())
-    setGameover({
-      over: false,
-      reason: null
-    })
-
-    if (figure) {
-      setFigure('x')
-      setTurn('x')
-    }
-    if (roomName) {
-      socket.emit('restart game', roomName)
+  const reset = () => {
+    if (!roomName) {
+      setTCount(0)
+      setStage(createStage())
+      setGameover({
+        over: false,
+        reason: null
+      })
+    } else {
+      socket.emit('restart game')
     }
   }
 
   useEffect(() => {
-    const onPlayer = (name: string, socketId: string) => {
-      if (socket.id === socketId) {
-        setPlayerName(name)
-      }
+    const onCreate = (playerName: string, socketId: string) => {
+      socket.id === socketId && setPlayerName(playerName)
     }
-    const onTag = (stage: Stages, moveCount: number, turn: string) => {
-      setStage(stage)
-      setTCount(moveCount)
-      turn === 'x' ? setTurn('o') : setTurn('x')
-    }
-    const onStarted = async(players: Player[]) => {
+    const onStarted = (players: Player[]) => {
       players.forEach(player => {
         if (player.id === socket.id) {
-          console.log(player.name, ' - ', player.figure)
+          setLobby(players)
           setFigure(player.figure)
           setGameStarted(true)
         }
       })
-      setLobby(players)
     }
-    const onRestart = () => {
+    const onTagged = (stage: Stages, tCount: number, turn: 'x' | 'o') => {
+      setStage(stage)
+      setTCount(tCount)
+      setTurn(turn)
+    }
+    const onRestarted = () => {
       reset()
-      console.log('reset')
     }
 
-    socket.on('player created', onPlayer)
-    socket.on('cell tagged', onTag)
+    socket.on('player created', onCreate)
     socket.on('game started', onStarted)
-    socket.on('game restarted', onRestart)
+    socket.on('cell tagged', onTagged)
+    socket.on('game restarted', onRestarted)
 
     return () => {
-      socket.off('player created', onPlayer)
-      socket.off('cell tagged', onTag)
+      socket.off('player created', onCreate)
       socket.off('game started', onStarted)
-      socket.off('game restarted', onRestart)
+      socket.off('cell tagged', onTagged)
+      socket.off('game restarted', onRestarted)
     }
   }, [])
 
@@ -125,6 +116,7 @@ const TicTac: React.FC = () => {
         />
       }
       <div className="game">
+        {gameStarted ? 'started' : 'not started'}
         <span>Player name: { playerName && playerName }; Figure: {figure}</span>
         <span>Room name: { roomName && roomName }</span>
         <Stage stage={stage} tag={tag} gameStarted={gameStarted}/>
